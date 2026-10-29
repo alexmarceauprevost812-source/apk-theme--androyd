@@ -12,6 +12,7 @@
   color-scheme:dark;
 }
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 html,body{height:100%;margin:0;background:var(--noir);color:var(--os);font-family:var(--mono);overflow:hidden;
   -webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
 button{font-family:inherit;color:inherit;background:none;border:0;cursor:pointer}
@@ -50,7 +51,7 @@ canvas#braises{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-e
 .app:active .ic{box-shadow:0 0 18px var(--rouge);transform:scale(.92)}
 
 /* Tiroir */
-#tiroir{background:rgba(0,0,0,.94);transform:translateY(100%);transition:transform .32s cubic-bezier(.2,.8,.2,1);z-index:3}
+#tiroir{background:rgba(0,0,0,.97);transform:translateY(100%);transition:transform .32s cubic-bezier(.2,.8,.2,1);z-index:3}
 #tiroir.ouvert{transform:none}
 .barre{display:flex;gap:10px;align-items:center;padding-bottom:12px}
 .barre input{flex:1;min-width:0;background:#0f0a0b;border:1px solid #2a1a1c;border-radius:22px;color:var(--os);padding:11px 16px;font-family:var(--mono);font-size:13px}
@@ -170,7 +171,7 @@ canvas#braises{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-e
     <button type="button" data-sys="fond"><span>Fond d'écran du téléphone</span>›</button>
     <button type="button" data-sys="parametres"><span>Paramètres Android</span>›</button>
   </div>
-  <p class="signature">LexOS Démon 2.0 · Alex Marceau Prevost · Normandin, QC</p>
+  <p class="signature">LexOS Démon 2.1 · Alex Marceau Prevost · Normandin, QC</p>
 </section>
 
 <!-- MENU APPUI LONG -->

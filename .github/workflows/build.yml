@@ -38,7 +38,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: lexos-demon-v${{ github.run_number }}
-          name: LexOS Démon 2.0 (build ${{ github.run_number }})
+          name: LexOS Démon 2.1 (build ${{ github.run_number }})
           body: Lanceur Android complet thème démon — toutes les applis, recherche, dock personnalisable, batterie, SMS avec animation, réglages.
           files: lexos-demon.apk
           make_latest: true
