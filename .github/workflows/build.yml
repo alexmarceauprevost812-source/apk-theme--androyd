@@ -23,8 +23,27 @@ jobs:
         with:
           gradle-version: "8.9"
 
+      - name: Récupérer la clé de signature
+        uses: actions/cache@v4
+        with:
+          path: ~/.lexos-cle
+          key: lexos-demon-cle-v1
+
+      - name: Créer la clé si elle n'existe pas encore
+        run: |
+          mkdir -p ~/.lexos-cle
+          if [ ! -f ~/.lexos-cle/cle.jks ]; then
+            openssl rand -hex 24 > ~/.lexos-cle/mdp
+            keytool -genkeypair -keystore ~/.lexos-cle/cle.jks -alias lexosdemon -keyalg RSA -keysize 2048 \
+              -validity 10000 -storepass "$(cat ~/.lexos-cle/mdp)" -keypass "$(cat ~/.lexos-cle/mdp)" \
+              -dname "CN=Alex Marceau Prevost, O=LexOS, L=Normandin, ST=QC, C=CA"
+          fi
+
       - name: Compiler
-        run: gradle :app:assembleDebug --no-daemon
+        run: |
+          export LEXOS_CLE=$HOME/.lexos-cle/cle.jks
+          export LEXOS_CLE_MDP=$(cat ~/.lexos-cle/mdp)
+          gradle :app:assembleDebug --no-daemon
 
       - name: Renommer
         run: cp app/build/outputs/apk/debug/app-debug.apk lexos-demon.apk
@@ -39,6 +58,6 @@ jobs:
         with:
           tag_name: lexos-demon-v${{ github.run_number }}
           name: LexOS Démon 2.1 (build ${{ github.run_number }})
-          body: Lanceur Android complet thème démon — toutes les applis, recherche, dock personnalisable, batterie, SMS avec animation, réglages.
+          body: Thème démon complet — lanceur, fond d'écran animé (accueil + verrouillage), guide Theme Park — toutes les applis, recherche, dock personnalisable, batterie, SMS avec animation, réglages.
           files: lexos-demon.apk
           make_latest: true

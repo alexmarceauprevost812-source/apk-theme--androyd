@@ -19,6 +19,10 @@
             <action android:name="android.intent.action.DIAL" />
         </intent>
         <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="samsungapps" />
+        </intent>
+        <intent>
             <action android:name="android.media.action.STILL_IMAGE_CAMERA" />
         </intent>
     </queries>
@@ -49,5 +53,17 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+
+        <!-- Fond d'écran animé (accueil + écran de verrouillage) -->
+        <service
+            android:name=".DemonWallpaper"
+            android:label="@string/fond_nom"
+            android:exported="true"
+            android:permission="android.permission.BIND_WALLPAPER">
+            <intent-filter>
+                <action android:name="android.service.wallpaper.WallpaperService" />
+            </intent-filter>
+            <meta-data android:name="android.service.wallpaper" android:resource="@xml/demon_wallpaper" />
+        </service>
     </application>
 </manifest>

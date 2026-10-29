@@ -2,7 +2,9 @@ package ca.lexos.demon
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.WallpaperManager
 import android.content.BroadcastReceiver
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
@@ -164,6 +166,12 @@ class MainActivity : Activity() {
                 "parametres" -> Intent(Settings.ACTION_SETTINGS)
                 "accueil" -> Intent(Settings.ACTION_HOME_SETTINGS)
                 "fond" -> Intent(Intent.ACTION_SET_WALLPAPER)
+                "fondanime" -> Intent(WallpaperManager.ACTION_CHANGE_LIVE_WALLPAPER).putExtra(
+                    WallpaperManager.EXTRA_LIVE_WALLPAPER_COMPONENT,
+                    ComponentName(this@MainActivity, DemonWallpaper::class.java))
+                "goodlock" -> Intent(Intent.ACTION_VIEW, Uri.parse("samsungapps://ProductDetail/com.samsung.android.goodlock"))
+                "clavier" -> Intent(Settings.ACTION_INPUT_METHOD_SETTINGS)
+                "affichage" -> Intent(Settings.ACTION_DISPLAY_SETTINGS)
                 else -> null
             } ?: return
             lancer(i)

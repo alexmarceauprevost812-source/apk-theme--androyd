@@ -15,7 +15,18 @@ android {
         versionName = "2.1-demon"
     }
 
+    // Clé gardée dans le cache GitHub (jamais dans le dépôt) pour que les mises à jour s'installent par-dessus
+    val cle = System.getenv("LEXOS_CLE")
+    signingConfigs {
+        if (cle != null && file(cle).exists()) create("lexos") {
+            storeFile = file(cle)
+            storePassword = System.getenv("LEXOS_CLE_MDP")
+            keyAlias = "lexosdemon"
+            keyPassword = System.getenv("LEXOS_CLE_MDP")
+        }
+    }
     buildTypes {
+        getByName("debug") { signingConfigs.findByName("lexos")?.let { signingConfig = it } }
         release { isMinifyEnabled = false }
     }
     compileOptions {

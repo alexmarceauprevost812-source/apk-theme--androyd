@@ -92,6 +92,7 @@ canvas#braises{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-e
 .liste button,.liste label{display:flex;justify-content:space-between;align-items:center;text-align:left;padding:15px 2px;border-bottom:1px solid var(--ligne);font-size:13px}
 .liste small{color:var(--cendre);font-size:11px}
 .liste input[type=checkbox]{accent-color:var(--rouge);width:20px;height:20px}
+.titreSec{margin:16px 0 0;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--rouge)}
 .signature{margin-top:auto;font-size:10px;color:#4d3f41;text-align:center}
 
 /* Surgissement */
@@ -162,7 +163,12 @@ canvas#braises{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-e
 <section class="vue" id="reglages" hidden>
   <div class="tete"><button type="button" data-retour aria-label="Retour">‹</button><b>Réglages LexOS Démon</b></div>
   <div class="liste">
-    <button type="button" data-sys="accueil"><span>Choisir comme écran d'accueil<br><small id="etatAccueil">…</small></span>›</button>
+    <p class="titreSec">Thème complet — 4 étapes</p>
+    <button type="button" data-sys="accueil"><span>1. Écran d'accueil LexOS Démon<br><small id="etatAccueil">…</small></span>›</button>
+    <button type="button" data-sys="fondanime"><span>2. Fond d'écran animé démon<br><small>choisis « Accueil et écran de verrouillage »</small></span>›</button>
+    <button type="button" data-sys="affichage"><span>3. Mode sombre<br><small>Affichage → Sombre (menus et applis Samsung en noir)</small></span>›</button>
+    <button type="button" data-sys="goodlock"><span>4. Good Lock → Theme Park<br><small>panneau rapide, clavier et icônes en rouge et noir</small></span>›</button>
+    <p class="titreSec">Options</p>
     <label><span>Vraies couleurs des icônes<br><small>sinon teintées de rouge</small></span><input type="checkbox" id="optCouleurs"></label>
     <label><span>Braises animées</span><input type="checkbox" id="optBraises" checked></label>
     <label><span>Démon à l'ouverture des applis</span><input type="checkbox" id="optSurgit" checked></label>
