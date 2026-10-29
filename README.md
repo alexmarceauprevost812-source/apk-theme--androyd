@@ -1,15 +1,17 @@
-# LexOS Démon — APK
+# LexOS Démon 2.0 — lanceur Android complet
 
-Thème Android démon animé : yeux rouges qui clignent et suivent le doigt, colère au toucher, braises qui montent, et animation plein écran à chaque envoi de SMS.
+Écran d'accueil Android au thème démon : yeux entièrement rouges qui clignent, suivent le doigt et se fâchent au toucher, braises qui montent.
 
-## Obtenir l'APK
-1. Crée un dépôt GitHub (privé), par exemple `lexos-demon`.
-2. Dépose tout le contenu de ce dossier (y compris le dossier caché `.github`).
-3. GitHub Actions compile tout seul. Après 3-4 minutes : **Releases → LexOS Démon → lexos-demon.apk**.
-4. Installe l'APK sur le téléphone.
+## Fonctions
+- **Accueil** : heure, date, batterie réelle, yeux du démon, dock de 5 places.
+- **Tiroir d'applis** : glisse vers le haut (ou touche « Toutes les applis »). Toutes tes applis avec leurs icônes, recherche (Entrée ouvre la 1re trouvée).
+- **Appui long** sur une appli : la mettre dans le dock, voir ses infos, la désinstaller.
+- **Dock** : appui long sur une place pour la changer ou la remettre par défaut.
+- **SMS** : numéro + message → le démon surgit → Messages s'ouvre avec le texte prêt.
+- **Le démon surgit** à l'ouverture de chaque appli (désactivable).
+- **Réglages** (⚙ dans le tiroir) : écran d'accueil par défaut, icônes en vraies couleurs ou teintées de rouge, braises, vibrations, fond d'écran.
 
-## Utilisation
-- Ouvre « LexOS Démon » depuis le tiroir d'applis, ou choisis-le comme écran d'accueil (Paramètres → Applications → Application d'accueil).
-- SMS : écris le numéro, puis le message. Le démon surgit, puis Messages s'ouvre avec le texte prêt à partir.
+## Installer
+Releases → la plus récente → `lexos-demon.apk`. Puis Réglages ⚙ → « Choisir comme écran d'accueil ».
 
-Paquet : `ca.lexos.demon` (s'installe à côté de LexOS PRO et LexOS Alex).
+Paquet `ca.lexos.demon` (s'installe à côté de LexOS PRO et LexOS Alex). GitHub Actions compile à chaque envoi sur `main`.

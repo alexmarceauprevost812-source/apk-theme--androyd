@@ -2,187 +2,402 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>LexOS Démon</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&family=JetBrains+Mono:wght@400;600&display=swap">
 <style>
-html,body{margin:0}button{-webkit-tap-highlight-color:transparent}
-/* Layout : un écran d'accueil Android plein noir, yeux au centre, dock en bas */
+/* Écran d'accueil plein noir : heure en haut, yeux au centre, dock en bas ; tiroir qui monte */
 :root{
-  --noir:#000; --braise:#0d0607; --rouge:#e0262b; --sang:#7a0d12; --cendre:#8a7a7c; --os:#f1e9ea;
-  --display:"Rajdhani",system-ui,sans-serif; --mono:"JetBrains Mono",ui-monospace,monospace;
+  --noir:#000; --braise:#0d0607; --rouge:#e0262b; --vif:#ff3b3b; --sang:#7a0d12; --cendre:#8a7a7c; --os:#f1e9ea; --ligne:#1d1012;
+  --display:"Rajdhani","Roboto Condensed",system-ui,sans-serif; --mono:"JetBrains Mono","Roboto Mono",ui-monospace,monospace;
   color-scheme:dark;
 }
-html,body{height:100%}
-body{background:var(--noir);color:var(--os);font-family:var(--mono);overflow:hidden;
-  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
-  -webkit-tap-highlight-color:transparent;user-select:none}
-canvas#braises{position:fixed;inset:0;width:100%;height:100%;z-index:0}
-.ecran{position:relative;z-index:1;height:100%;display:flex;flex-direction:column;max-width:460px;margin:0 auto}
-.haut{display:flex;justify-content:space-between;font-size:12px;color:var(--cendre);padding-block:10px}
-.heure{text-align:center;margin-top:4vh}
-.heure b{font-family:var(--display);font-weight:700;font-size:64px;letter-spacing:.04em;color:var(--os);display:block;line-height:1}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;background:var(--noir);color:var(--os);font-family:var(--mono);overflow:hidden;
+  -webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+button{font-family:inherit;color:inherit;background:none;border:0;cursor:pointer}
+canvas#braises{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+.vue{position:fixed;inset:0;z-index:1;display:flex;flex-direction:column;
+  padding:calc(env(safe-area-inset-top,0px) + 8px) 18px calc(env(safe-area-inset-bottom,0px) + 8px)}
+
+/* Accueil */
+.haut{display:flex;justify-content:space-between;font-size:11px;color:var(--cendre);letter-spacing:.04em}
+.haut .r{color:var(--rouge)}
+.heure{text-align:center;margin-top:5vh}
+.heure b{font-family:var(--display);font-weight:700;font-size:72px;letter-spacing:.03em;display:block;line-height:1}
 .heure span{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--rouge)}
 .zone{flex:1;display:grid;place-items:center;position:relative}
-.yeux{display:flex;gap:44px;position:relative;filter:drop-shadow(0 0 14px rgba(224,38,43,.55));transition:transform .25s ease}
-.oeil{width:120px;height:62px;position:relative;overflow:hidden}
+.lueur{position:absolute;width:300px;height:140px;border-radius:50%;background:radial-gradient(closest-side,rgba(224,38,43,.2),transparent);animation:respire 3.2s ease-in-out infinite}
+.yeux{display:flex;gap:44px;filter:drop-shadow(0 0 16px rgba(224,38,43,.65));transition:transform .2s ease}
+.oeil{width:120px;height:62px}
 .oeil svg{width:100%;height:100%;display:block}
-.paupiere{transform-origin:50% 0;animation:cligne 5.5s infinite}
 .oeil.d{transform:scaleX(-1)}
-.pupille{transition:transform .12s linear}
+.paupiere{transform-origin:50% 0;animation:cligne 5.5s infinite}
+.yeux.colere{filter:drop-shadow(0 0 30px rgba(255,40,40,1))}
 .yeux.colere .oeil{animation:tremble .08s linear 6}
-.yeux.colere{filter:drop-shadow(0 0 28px rgba(255,40,40,.95))}
-@keyframes cligne{0%,92%,100%{transform:scaleY(0)}95%{transform:scaleY(1)}}
-@keyframes tremble{50%{translate:2px -1px}}
-.lueur{position:absolute;width:300px;height:140px;border-radius:50%;background:radial-gradient(closest-side,rgba(224,38,43,.18),transparent);animation:respire 3.2s ease-in-out infinite}
-@keyframes respire{50%{opacity:.35;transform:scale(1.15)}}
-.murmure{position:absolute;bottom:14%;font-size:12px;color:var(--cendre);letter-spacing:.06em;min-height:1.2em;text-align:center}
+.murmure{position:absolute;bottom:12%;font-size:12px;color:var(--cendre);text-align:center;min-height:1.2em;padding:0 10px}
 .murmure::before{content:"> ";color:var(--rouge)}
-.dock{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding-block:14px 18px;border-top:1px solid #1d1012}
-.app{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:11px;color:var(--cendre);background:none;border:0;font-family:var(--mono);cursor:pointer}
-.app i{width:52px;height:52px;border-radius:16px;background:var(--braise);border:1px solid var(--sang);display:grid;place-items:center;font-style:normal;font-size:22px;color:var(--rouge);transition:box-shadow .2s,transform .15s}
-.app:active i,.app:focus-visible i{box-shadow:0 0 18px var(--rouge);transform:scale(.94);outline:none}
-.app:focus-visible{outline:none}
-.astuce{font-size:10px;color:#4d3f41;text-align:center;padding-bottom:6px}
+.dock{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;padding-top:12px;border-top:1px solid var(--ligne)}
+.monter{text-align:center;font-size:10px;color:#5a4648;padding:8px 0 2px;letter-spacing:.1em}
+.monter::before{content:"︿";display:block;color:var(--rouge);font-size:14px;animation:flotte 1.8s ease-in-out infinite}
+
+/* Icônes */
+.app{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:10.5px;color:var(--cendre);min-width:0}
+.app .ic{width:52px;height:52px;border-radius:16px;background:var(--braise);border:1px solid var(--sang);display:grid;place-items:center;
+  font-size:22px;color:var(--rouge);overflow:hidden;transition:box-shadow .2s,transform .15s}
+.app .ic img{width:38px;height:38px;filter:saturate(.35) sepia(.5) hue-rotate(-30deg) saturate(3) brightness(.95)}
+.app.vrai .ic img{filter:none}
+.app span{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.app:active .ic{box-shadow:0 0 18px var(--rouge);transform:scale(.92)}
+
+/* Tiroir */
+#tiroir{background:rgba(0,0,0,.94);transform:translateY(100%);transition:transform .32s cubic-bezier(.2,.8,.2,1);z-index:3}
+#tiroir.ouvert{transform:none}
+.barre{display:flex;gap:10px;align-items:center;padding-bottom:12px}
+.barre input{flex:1;min-width:0;background:#0f0a0b;border:1px solid #2a1a1c;border-radius:22px;color:var(--os);padding:11px 16px;font-family:var(--mono);font-size:13px}
+.barre input:focus{outline:none;border-color:var(--rouge)}
+.barre button{width:42px;height:42px;border-radius:50%;border:1px solid var(--sang);color:var(--rouge);font-size:18px}
+.grille{flex:1;overflow-y:auto;display:grid;grid-template-columns:repeat(4,1fr);gap:18px 8px;align-content:start;padding:6px 0 30px;-webkit-overflow-scrolling:touch}
+.compte{font-size:10px;color:#5a4648;padding-bottom:6px;letter-spacing:.08em}
+.vide{grid-column:1/-1;text-align:center;color:var(--cendre);font-size:12px;padding:30px 0}
+
+/* Menu appui long */
+#menu{position:fixed;inset:0;z-index:6;background:rgba(0,0,0,.7);display:flex;align-items:flex-end}
+.feuille{width:100%;background:#0b0607;border-top:1px solid var(--rouge);border-radius:18px 18px 0 0;padding:16px 18px calc(env(safe-area-inset-bottom,0px) + 16px)}
+.feuille h3{margin:0 0 10px;font-family:var(--display);font-size:20px;letter-spacing:.05em}
+.feuille button{display:block;width:100%;text-align:left;padding:13px 4px;border-bottom:1px solid var(--ligne);font-size:13px}
+.feuille button:last-child{border:0;color:var(--cendre)}
+.feuille button::before{content:"> ";color:var(--rouge)}
+
 /* SMS */
-.sms{position:fixed;inset:0;z-index:5;background:var(--noir);display:flex;flex-direction:column;max-width:460px;margin:0 auto;
-  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
-.sms header{display:flex;align-items:center;gap:12px;padding-block:14px;border-bottom:1px solid #1d1012}
-.sms header button{background:none;border:0;color:var(--rouge);font-size:22px;cursor:pointer}
-.sms header b{font-family:var(--display);font-size:20px;letter-spacing:.05em}
-.sms header small{display:block;font-size:10px;color:var(--cendre)}
-.fil{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:10px;padding-block:16px}
-.bulle{max-width:78%;padding:10px 14px;border-radius:16px;font-size:13px;line-height:1.4;overflow-wrap:anywhere}
-.bulle.eux{align-self:flex-start;background:#151012;border:1px solid #2a1a1c}
-.bulle.moi{align-self:flex-end;background:var(--braise);border:1px solid var(--rouge);color:var(--os)}
-.bulle.moi.part{animation:brule 1.1s ease-out}
+#sms{background:var(--noir);z-index:4}
+.tete{display:flex;align-items:center;gap:12px;padding-bottom:12px;border-bottom:1px solid var(--ligne)}
+.tete button{color:var(--rouge);font-size:26px;line-height:1}
+.tete b{font-family:var(--display);font-size:20px;letter-spacing:.05em;display:block}
+.tete input{background:none;border:0;border-bottom:1px solid #2a1a1c;color:var(--os);font-family:var(--mono);font-size:13px;padding:3px 0;width:100%}
+.tete input:focus{outline:none;border-color:var(--rouge)}
+.fil{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:10px;padding:16px 0}
+.bulle{max-width:78%;padding:10px 14px;border-radius:16px;font-size:13px;line-height:1.4;overflow-wrap:anywhere;align-self:flex-end;background:var(--braise);border:1px solid var(--rouge)}
+.bulle.part{animation:brule 1.1s ease-out}
 .etat{align-self:flex-end;font-size:10px;color:var(--rouge);margin-top:-6px}
-@keyframes brule{0%{transform:translateY(30px) scale(.9);opacity:0;box-shadow:0 0 0 var(--rouge)}
-  40%{opacity:1;box-shadow:0 0 30px var(--rouge);border-color:#ff6a3d}100%{box-shadow:0 0 0 transparent}}
-.saisie{display:flex;gap:10px;padding-block:12px 18px}
+.aide{color:var(--cendre);font-size:12px;text-align:center;margin:auto 0;line-height:1.6}
+.saisie{display:flex;gap:10px;padding-top:10px}
 .saisie input{flex:1;min-width:0;background:#0f0a0b;border:1px solid #2a1a1c;border-radius:22px;color:var(--os);padding:12px 16px;font-family:var(--mono);font-size:13px}
 .saisie input:focus{outline:none;border-color:var(--rouge)}
-.saisie button{width:46px;height:46px;border-radius:50%;border:0;background:var(--rouge);color:#000;font-size:20px;cursor:pointer}
-/* Yeux qui surgissent à l'envoi */
-.surgit{position:fixed;inset:0;z-index:9;display:grid;place-items:center;background:rgba(0,0,0,.85);pointer-events:none;opacity:0}
-.surgit.on{animation:surgit 1.3s ease-out}
-.surgit .yeux{transform:scale(1.3)}
-.surgit .paupiere{animation:ouvre 1.3s ease-out}
+.saisie button{width:46px;height:46px;border-radius:50%;background:var(--rouge);color:#000;font-size:20px}
+
+/* Réglages */
+#reglages{background:var(--noir);z-index:4}
+.liste{display:flex;flex-direction:column;padding-top:8px}
+.liste button,.liste label{display:flex;justify-content:space-between;align-items:center;text-align:left;padding:15px 2px;border-bottom:1px solid var(--ligne);font-size:13px}
+.liste small{color:var(--cendre);font-size:11px}
+.liste input[type=checkbox]{accent-color:var(--rouge);width:20px;height:20px}
+.signature{margin-top:auto;font-size:10px;color:#4d3f41;text-align:center}
+
+/* Surgissement */
+.surgit{position:fixed;inset:0;z-index:9;display:grid;place-items:center;background:rgba(0,0,0,.88);pointer-events:none;opacity:0}
+.surgit .yeux{transform:scale(1.35)}
+.surgit.on{animation:surgit 1.1s ease-out}
+.surgit.on .paupiere{animation:ouvre 1.1s ease-out}
+.surgit p{position:absolute;bottom:30%;font-size:12px;color:var(--rouge);letter-spacing:.12em;text-transform:uppercase;margin:0}
+
+@keyframes cligne{0%,92%,100%{transform:scaleY(0)}95%{transform:scaleY(1)}}
+@keyframes tremble{50%{translate:2px -1px}}
+@keyframes respire{50%{opacity:.35;transform:scale(1.15)}}
+@keyframes flotte{50%{transform:translateY(-4px)}}
 @keyframes surgit{0%{opacity:0}15%,70%{opacity:1}100%{opacity:0}}
 @keyframes ouvre{0%{transform:scaleY(1)}30%,100%{transform:scaleY(0)}}
-@media (prefers-reduced-motion:reduce){.paupiere,.lueur{animation:none}.pupille{transition:none}}
+@keyframes brule{0%{transform:translateY(30px) scale(.9);opacity:0}40%{opacity:1;box-shadow:0 0 30px var(--rouge);border-color:#ff6a3d}100%{box-shadow:none}}
+.calme .paupiere,.calme .lueur,.calme .monter::before{animation:none}
 </style>
-
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><clipPath id="oeilClip"><path d="M2 4 Q60 -2 118 28 Q70 70 2 4Z"/></clipPath></defs></svg>
 <canvas id="braises"></canvas>
-<div class="ecran">
-  <div class="haut"><span>lexos://démon</span><span id="batt">▮▮▮▯ 78%</span></div>
-  <div class="heure"><b id="h">04:13</b><span id="d">jeudi 29 oct.</span></div>
+
+<template id="tplYeux">
+  <div class="yeux">
+    <div class="oeil"><svg viewBox="0 0 120 62"><path d="M2 4 Q60 -2 118 28 Q70 70 2 4Z" fill="#e0262b"/><rect class="paupiere" x="0" y="0" width="120" height="62" fill="#000" clip-path="url(#oeilClip)"/></svg></div>
+    <div class="oeil d"><svg viewBox="0 0 120 62"><path d="M2 4 Q60 -2 118 28 Q70 70 2 4Z" fill="#e0262b"/><rect class="paupiere" x="0" y="0" width="120" height="62" fill="#000" clip-path="url(#oeilClip)"/></svg></div>
+  </div>
+</template>
+
+<!-- ACCUEIL -->
+<section class="vue" id="accueil">
+  <div class="haut"><span>lexos://démon</span><span id="batt" class="r">▮▮▮▯ --%</span></div>
+  <div class="heure"><b id="h">00:00</b><span id="d">…</span></div>
   <div class="zone" id="zone">
     <div class="lueur"></div>
-    <div class="yeux" id="yeux">
-      <div class="oeil g"><svg viewBox="0 0 120 62">
-        <defs><clipPath id="cg"><path d="M2 4 Q60 -2 118 28 Q70 70 2 4Z"/></clipPath></defs>
-        <path d="M2 4 Q60 -2 118 28 Q70 70 2 4Z" fill="#e0262b"/>
-        <g clip-path="url(#cg)"><ellipse class="pupille" cx="58" cy="26" rx="5" ry="15" fill="#e0262b"/>
-        <rect class="paupiere" x="0" y="0" width="120" height="62" fill="#000"/></g></svg></div>
-      <div class="oeil d"><svg viewBox="0 0 120 62">
-        <defs><clipPath id="cd"><path d="M2 4 Q60 -2 118 28 Q70 70 2 4Z"/></clipPath></defs>
-        <path d="M2 4 Q60 -2 118 28 Q70 70 2 4Z" fill="#e0262b"/>
-        <g clip-path="url(#cd)"><ellipse class="pupille" cx="58" cy="26" rx="5" ry="15" fill="#e0262b"/>
-        <rect class="paupiere" x="0" y="0" width="120" height="62" fill="#000"/></g></svg></div>
-    </div>
+    <div id="yeuxAccueil"></div>
     <div class="murmure" id="m">je te regarde…</div>
   </div>
-  <nav class="dock">
-    <button class="app" type="button" data-app="appel"><i>☎</i>Appel</button>
-    <button class="app" type="button" id="ouvrirSms"><i>✉</i>SMS</button>
-    <button class="app" type="button" data-app="photo"><i>◎</i>Photo</button>
-    <button class="app" type="button"><i>⌘</i>Labo</button>
-  </nav>
-  <div class="astuce">bouge ton doigt · touche les yeux pour le fâcher</div>
-</div>
+  <nav class="dock" id="dock"></nav>
+  <div class="monter" id="monter">TOUTES LES APPLIS</div>
+</section>
 
-<section class="sms" id="sms" hidden>
-  <header><button type="button" id="retour" aria-label="Retour">‹</button><div><b>Message</b><input id="numero" type="tel" inputmode="tel" placeholder="numéro…" autocomplete="off" style="background:none;border:0;border-bottom:1px solid #2a1a1c;color:#f1e9ea;font-family:inherit;font-size:12px;padding:2px 0;width:100%"></div></header>
-  <div class="fil" id="fil">
-    <div class="bulle eux">T'es encore debout à 4 h du matin? 😅</div>
-    <div class="bulle moi">Je code mon téléphone LexOS 🔥</div>
-    <div class="etat">livré</div>
-    <div class="bulle eux">Va dormir!</div>
+<!-- TIROIR -->
+<section class="vue" id="tiroir">
+  <div class="barre">
+    <input id="cherche" type="search" placeholder="> chercher une appli…" autocomplete="off">
+    <button type="button" id="versReglages" aria-label="Réglages">⚙</button>
   </div>
+  <div class="compte" id="compte">chargement…</div>
+  <div class="grille" id="grille"></div>
+</section>
+
+<!-- SMS -->
+<section class="vue" id="sms" hidden>
+  <div class="tete">
+    <button type="button" data-retour aria-label="Retour">‹</button>
+    <div style="flex:1;min-width:0"><b>Message</b><input id="numero" type="tel" inputmode="tel" placeholder="numéro du destinataire" autocomplete="off"></div>
+  </div>
+  <div class="fil" id="fil"><p class="aide" id="aide">Écris le numéro, puis ton message.<br>Le démon l'emporte, puis Messages s'ouvre<br>avec le texte prêt à partir.</p></div>
   <form class="saisie" id="form">
     <input id="texte" type="text" placeholder="Écris au démon…" autocomplete="off">
     <button type="submit" aria-label="Envoyer">➤</button>
   </form>
 </section>
 
-<div class="surgit" id="surgit">
-  <div class="yeux">
-    <div class="oeil g"><svg viewBox="0 0 120 62"><defs><clipPath id="sg"><path d="M2 4 Q60 -2 118 28 Q70 70 2 4Z"/></clipPath></defs>
-      <path d="M2 4 Q60 -2 118 28 Q70 70 2 4Z" fill="#e0262b"/><g clip-path="url(#sg)"><ellipse cx="58" cy="26" rx="3" ry="15" fill="#e0262b"/>
-      <rect class="paupiere" x="0" y="0" width="120" height="62" fill="#000"/></g></svg></div>
-    <div class="oeil d"><svg viewBox="0 0 120 62"><defs><clipPath id="sd"><path d="M2 4 Q60 -2 118 28 Q70 70 2 4Z"/></clipPath></defs>
-      <path d="M2 4 Q60 -2 118 28 Q70 70 2 4Z" fill="#e0262b"/><g clip-path="url(#sd)"><ellipse cx="58" cy="26" rx="3" ry="15" fill="#e0262b"/>
-      <rect class="paupiere" x="0" y="0" width="120" height="62" fill="#000"/></g></svg></div>
+<!-- RÉGLAGES -->
+<section class="vue" id="reglages" hidden>
+  <div class="tete"><button type="button" data-retour aria-label="Retour">‹</button><b>Réglages LexOS Démon</b></div>
+  <div class="liste">
+    <button type="button" data-sys="accueil"><span>Choisir comme écran d'accueil<br><small id="etatAccueil">…</small></span>›</button>
+    <label><span>Vraies couleurs des icônes<br><small>sinon teintées de rouge</small></span><input type="checkbox" id="optCouleurs"></label>
+    <label><span>Braises animées</span><input type="checkbox" id="optBraises" checked></label>
+    <label><span>Démon à l'ouverture des applis</span><input type="checkbox" id="optSurgit" checked></label>
+    <label><span>Vibrations</span><input type="checkbox" id="optVibre" checked></label>
+    <button type="button" id="resetDock"><span>Remettre le dock par défaut</span>›</button>
+    <button type="button" data-sys="fond"><span>Fond d'écran du téléphone</span>›</button>
+    <button type="button" data-sys="parametres"><span>Paramètres Android</span>›</button>
   </div>
-</div>
+  <p class="signature">LexOS Démon 2.0 · Alex Marceau Prevost · Normandin, QC</p>
+</section>
+
+<!-- MENU APPUI LONG -->
+<div id="menu" hidden><div class="feuille" id="feuille"></div></div>
+
+<div class="surgit" id="surgit"><div id="yeuxSurgit"></div><p id="surgitTxt"></p></div>
 
 <script>
-// SMS : envoi avec animation démon
-const sms=document.getElementById("sms"),fil=document.getElementById("fil"),surgit=document.getElementById("surgit");
-document.getElementById("ouvrirSms").addEventListener("click",()=>{sms.hidden=false;fil.scrollTop=fil.scrollHeight;});
-document.getElementById("retour").addEventListener("click",()=>{sms.hidden=true;});
-document.getElementById("form").addEventListener("submit",e=>{
-  e.preventDefault();const champ=document.getElementById("texte"),txt=champ.value.trim();if(!txt)return;
-  surgit.classList.remove("on");void surgit.offsetWidth;surgit.classList.add("on");
-  const b=document.createElement("div");b.className="bulle moi part";b.textContent=txt;
-  const s=document.createElement("div");s.className="etat";s.textContent="le démon l'emporte…";
-  setTimeout(()=>{fil.append(b,s);fil.scrollTop=fil.scrollHeight;},500);
-  setTimeout(()=>{s.textContent="livré 👁‍🗨";},1700);
-  const num=document.getElementById("numero").value.trim();
-  vibrer(60);
-  if(window.Android&&num)setTimeout(()=>Android.envoyerSms(num,txt),1400);
-  champ.value="";
+(function(){
+const A = window.Android || null;
+const $ = id => document.getElementById(id);
+const lire = (k,d) => { try { const v = localStorage.getItem(k); return v===null ? d : JSON.parse(v); } catch(e){ return d; } };
+const ecrire = (k,v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} };
+
+/* ---------- Options ---------- */
+const opt = Object.assign({couleurs:false, braises:true, surgit:true, vibre:true}, lire("opt",{}));
+function appliquerOptions(){
+  $("optCouleurs").checked = opt.couleurs; $("optBraises").checked = opt.braises;
+  $("optSurgit").checked = opt.surgit; $("optVibre").checked = opt.vibre;
+  document.body.classList.toggle("vraies", opt.couleurs);
+  $("braises").hidden = !opt.braises;
+  rendreGrille(); rendreDock();
+}
+[["optCouleurs","couleurs"],["optBraises","braises"],["optSurgit","surgit"],["optVibre","vibre"]].forEach(([id,k])=>{
+  $(id).addEventListener("change", e => { opt[k] = e.target.checked; ecrire("opt",opt); appliquerOptions(); if(k==="braises"&&opt.braises) braises(); });
 });
-function vibrer(ms){try{if(window.Android)Android.vibrer(ms);else if(navigator.vibrate)navigator.vibrate(ms);}catch(e){}}
-window.retourAndroid=()=>{sms.hidden=true;};
-document.querySelectorAll("[data-app]").forEach(b=>b.addEventListener("click",()=>{if(window.Android)Android.ouvrirAppli(b.dataset.app);}));
+const vibrer = ms => { if(!opt.vibre) return; try { A ? A.vibrer(ms) : navigator.vibrate && navigator.vibrate(ms); } catch(e){} };
 
-// Heure
-const jours=["dim.","lun.","mar.","mer.","jeu.","ven.","sam."];
-function tic(){const n=new Date();document.getElementById("h").textContent=String(n.getHours()).padStart(2,"0")+":"+String(n.getMinutes()).padStart(2,"0");
-document.getElementById("d").textContent=n.toLocaleDateString("fr-CA",{weekday:"long",day:"numeric",month:"short"});}
-tic();setInterval(tic,10000);
+/* ---------- Yeux ---------- */
+const tpl = $("tplYeux");
+$("yeuxAccueil").appendChild(tpl.content.cloneNode(true));
+$("yeuxSurgit").appendChild(tpl.content.cloneNode(true));
+const yeux = $("yeuxAccueil").querySelector(".yeux");
+addEventListener("pointermove", e => {
+  const r = yeux.getBoundingClientRect(), cx = r.left+r.width/2, cy = r.top+r.height/2;
+  const dx = Math.max(-1,Math.min(1,(e.clientX-cx)/200)), dy = Math.max(-1,Math.min(1,(e.clientY-cy)/200));
+  yeux.style.transform = `translate(${dx*12}px,${dy*8}px)`;
+});
+const phrases = ["ne me touche pas.","tu as réveillé LexOS.","…","le démon a faim de batterie.","encore une fois et je ferme tes applis.","4 h du matin. va dormir."];
+let ip = 0;
+yeux.addEventListener("click", () => {
+  yeux.classList.remove("colere"); void yeux.offsetWidth; yeux.classList.add("colere");
+  vibrer(90); $("m").textContent = phrases[ip++ % phrases.length];
+  setTimeout(()=>yeux.classList.remove("colere"), 1400);
+});
+const surgit = $("surgit");
+function surgir(txt){
+  $("surgitTxt").textContent = txt || "";
+  surgit.classList.remove("on"); void surgit.offsetWidth; surgit.classList.add("on"); vibrer(60);
+}
 
-// Pupilles qui suivent le doigt
-const yeux=document.getElementById("yeux"),pupilles=[...document.querySelectorAll(".pupille")];
-function suivre(x,y){const r=yeux.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;
-  const dx=Math.max(-1,Math.min(1,(x-cx)/220)),dy=Math.max(-1,Math.min(1,(y-cy)/220));
-  pupilles.forEach((p,i)=>{const s=i?-1:1;p.style.transform=`translate(${dx*22*s}px,${dy*6}px)`;});
-  yeux.style.transform=`translate(${dx*6}px,${dy*4}px)`;}
-addEventListener("pointermove",e=>suivre(e.clientX,e.clientY));
-let t=0;(function errer(){if(!matchMedia("(prefers-reduced-motion:reduce)").matches){t+=.01;}
-  requestAnimationFrame(errer)})();
+/* ---------- Heure, batterie ---------- */
+function tic(){
+  const n = new Date();
+  $("h").textContent = String(n.getHours()).padStart(2,"0")+":"+String(n.getMinutes()).padStart(2,"0");
+  $("d").textContent = n.toLocaleDateString("fr-CA",{weekday:"long",day:"numeric",month:"short"});
+  if(A){ try{ const b = JSON.parse(A.batterie()); if(b.pct>=0){ const n4 = Math.round(b.pct/25);
+    $("batt").textContent = (b.charge?"⚡ ":"") + "▮".repeat(n4)+"▯".repeat(4-n4)+" "+b.pct+"%"; } }catch(e){} }
+}
+tic(); setInterval(tic, 15000);
 
-// Colère au toucher
-const phrases=["ne me touche pas.","tu as réveillé LexOS.","…","le démon a faim de batterie.","encore une fois et je ferme tes applis."];
-const m=document.getElementById("m");let i=0;
-yeux.addEventListener("click",()=>{yeux.classList.remove("colere");void yeux.offsetWidth;yeux.classList.add("colere");
-  pupilles.forEach(p=>p.setAttribute("rx","2.5"));vibrer(90);m.textContent=phrases[i++%phrases.length];
-  setTimeout(()=>{yeux.classList.remove("colere");pupilles.forEach(p=>p.setAttribute("rx","5"));},1400);});
+/* ---------- Applis ---------- */
+let applis = [];
+const EXEMPLES = ["Appareil photo","Calculatrice","Chrome","Galerie","Horloge","Maps","Messages","Musique","Paramètres","Play Store","Spotify","Téléphone","Termux","YouTube"]
+  .map(n => ({nom:n, pkg:"ex."+n, icone:""}));
+const SYSTEME = {appel:{nom:"Appel",car:"☎"}, sms:{nom:"SMS",car:"✉"}, photo:{nom:"Photo",car:"◎"}, web:{nom:"Web",car:"⌁"}};
+const DOCK_DEFAUT = ["sys:appel","sys:sms","sys:photo","sys:web","lexos:tiroir"];
+let dock = lire("dock", DOCK_DEFAUT);
 
-// Braises qui montent
-const c=document.getElementById("braises"),x=c.getContext("2d");let W,H,pts=[];
-function taille(){W=c.width=innerWidth*devicePixelRatio;H=c.height=innerHeight*devicePixelRatio;}
-taille();addEventListener("resize",taille);
-for(let k=0;k<45;k++)pts.push({x:Math.random(),y:Math.random(),v:.0006+Math.random()*.0016,r:Math.random()*1.8+.4,a:Math.random()});
-(function dessine(){x.clearRect(0,0,W,H);
-  pts.forEach(p=>{p.y-=p.v;p.x+=Math.sin(p.y*20+p.a*9)*.0004;if(p.y<0){p.y=1;p.x=Math.random();}
-    x.fillStyle=`rgba(224,${38+p.a*40|0},43,${.15+p.a*.5*p.y})`;x.beginPath();x.arc(p.x*W,p.y*H,p.r*devicePixelRatio,0,7);x.fill();});
-  if(!matchMedia("(prefers-reduced-motion:reduce)").matches)requestAnimationFrame(dessine);})();
+function icone(app){
+  const b = document.createElement("button");
+  b.type = "button"; b.className = "app" + (opt.couleurs ? " vrai" : "");
+  const ic = document.createElement("div"); ic.className = "ic";
+  if(app.icone){ const im = new Image(); im.src = app.icone; im.alt = ""; ic.appendChild(im); }
+  else ic.textContent = app.car || (app.nom||"?").charAt(0).toUpperCase();
+  const s = document.createElement("span"); s.textContent = app.nom;
+  b.append(ic, s);
+  return b;
+}
+
+function ouvrirAppli(app){
+  if(opt.surgit) surgir(app.nom);
+  setTimeout(() => { if(A) A.ouvrir(app.pkg); fermerTiroir(); }, opt.surgit ? 650 : 0);
+}
+
+let appui;
+function brancherAppuiLong(el, fn){
+  el.addEventListener("pointerdown", () => { appui = setTimeout(() => { appui = "long"; vibrer(30); fn(); }, 480); });
+  ["pointerup","pointerleave","pointercancel"].forEach(t => el.addEventListener(t, () => { if(appui !== "long") clearTimeout(appui); }));
+  el.addEventListener("click", e => { if(appui === "long"){ e.stopImmediatePropagation(); appui = null; } }, true);
+}
+
+function rendreGrille(){
+  const q = $("cherche").value.trim().toLowerCase();
+  const liste = applis.filter(a => a.nom.toLowerCase().includes(q));
+  const g = $("grille"); g.textContent = "";
+  $("compte").textContent = `${liste.length} appli${liste.length>1?"s":""}` + (A ? "" : " · exemples (aperçu hors téléphone)");
+  if(!liste.length){ const v = document.createElement("p"); v.className = "vide"; v.textContent = "aucune appli ne s'appelle comme ça."; g.appendChild(v); return; }
+  liste.forEach(app => {
+    const b = icone(app);
+    b.addEventListener("click", () => ouvrirAppli(app));
+    brancherAppuiLong(b, () => menuAppli(app));
+    g.appendChild(b);
+  });
+}
+
+function rendreDock(){
+  const d = $("dock"); d.textContent = "";
+  dock.forEach((cle, i) => {
+    let app, action;
+    if(cle.startsWith("sys:")){ const k = cle.slice(4); app = SYSTEME[k]; action = () => k === "sms" ? ouvrirVue("sms") : (opt.surgit && surgir(app.nom), setTimeout(()=>A && A.ouvrirSysteme(k), opt.surgit?650:0)); }
+    else if(cle === "lexos:tiroir"){ app = {nom:"Applis", car:"⌘"}; action = ouvrirTiroir; }
+    else { app = applis.find(a => a.pkg === cle); if(!app) app = {nom:"?", car:"+"}; action = () => app.pkg && ouvrirAppli(app); }
+    const b = icone(app); b.addEventListener("click", action);
+    brancherAppuiLong(b, () => menuDock(i));
+    d.appendChild(b);
+  });
+}
+
+window.lexos = {
+  recevoirApplis(liste){ applis = liste; rendreGrille(); rendreDock(); },
+  rechargerApplis(){ A && A.listerApplis(); },
+  accueil(){ fermerTout(); },
+  retour(){ if(!$("menu").hidden) $("menu").hidden = true; else if(!$("sms").hidden || !$("reglages").hidden) fermerVues(); else fermerTiroir(); },
+  reveil(){ tic(); majEtatAccueil(); },
+  surgir
+};
+
+/* ---------- Menus appui long ---------- */
+function feuille(titre, actions){
+  const f = $("feuille"); f.textContent = "";
+  const h = document.createElement("h3"); h.textContent = titre; f.appendChild(h);
+  actions.concat([["Annuler", ()=>{}]]).forEach(([t, fn]) => {
+    const b = document.createElement("button"); b.type = "button"; b.textContent = t;
+    b.addEventListener("click", () => { $("menu").hidden = true; fn(); }); f.appendChild(b);
+  });
+  $("menu").hidden = false;
+}
+$("menu").addEventListener("click", e => { if(e.target.id === "menu") $("menu").hidden = true; });
+function menuAppli(app){
+  feuille(app.nom, [
+    ["Mettre dans le dock", () => choisirPlaceDock(app.pkg)],
+    ["Infos de l'appli", () => A && A.infosAppli(app.pkg)],
+    ["Désinstaller", () => A && A.desinstaller(app.pkg)]
+  ]);
+}
+function choisirPlaceDock(pkg){
+  feuille("Remplacer quelle place du dock?", dock.map((cle, i) => {
+    const nom = cle.startsWith("sys:") ? SYSTEME[cle.slice(4)].nom : cle === "lexos:tiroir" ? "Applis" : (applis.find(a=>a.pkg===cle)||{nom:"?"}).nom;
+    return [`${i+1}. ${nom}`, () => { dock[i] = pkg; ecrire("dock", dock); rendreDock(); fermerTiroir(); }];
+  }));
+}
+function menuDock(i){
+  feuille("Place " + (i+1) + " du dock", [
+    ["Choisir une appli…", () => { ouvrirTiroir(); $("compte").textContent = "appui long sur une appli → Mettre dans le dock"; }],
+    ["Remettre par défaut", () => { dock[i] = DOCK_DEFAUT[i]; ecrire("dock", dock); rendreDock(); }]
+  ]);
+}
+$("resetDock").addEventListener("click", () => { dock = DOCK_DEFAUT.slice(); ecrire("dock", dock); rendreDock(); vibrer(40); });
+
+/* ---------- Navigation ---------- */
+const tiroir = $("tiroir");
+function ouvrirTiroir(){ tiroir.classList.add("ouvert"); }
+function fermerTiroir(){ tiroir.classList.remove("ouvert"); $("cherche").value = ""; $("cherche").blur(); rendreGrille(); }
+function ouvrirVue(id){ $(id).hidden = false; if(id === "reglages") majEtatAccueil(); }
+function fermerVues(){ $("sms").hidden = true; $("reglages").hidden = true; }
+function fermerTout(){ $("menu").hidden = true; fermerVues(); fermerTiroir(); }
+$("monter").addEventListener("click", ouvrirTiroir);
+$("versReglages").addEventListener("click", () => ouvrirVue("reglages"));
+document.querySelectorAll("[data-retour]").forEach(b => b.addEventListener("click", fermerVues));
+document.querySelectorAll("[data-sys]").forEach(b => b.addEventListener("click", () => A && A.ouvrirSysteme(b.dataset.sys)));
+$("cherche").addEventListener("input", rendreGrille);
+$("cherche").addEventListener("keydown", e => {
+  if(e.key === "Enter"){ const q = e.target.value.trim().toLowerCase(); const a = applis.find(x => x.nom.toLowerCase().includes(q)); if(a) ouvrirAppli(a); }
+});
+function majEtatAccueil(){
+  let ok = false; try { ok = A && A.estAccueilParDefaut(); } catch(e){}
+  $("etatAccueil").textContent = ok ? "c'est déjà ton écran d'accueil ✓" : "touche ici, puis choisis LexOS Démon";
+}
+
+// Glisser vers le haut / le bas
+let y0 = null, surGrille = false;
+addEventListener("touchstart", e => { y0 = e.touches[0].clientY; surGrille = !!e.target.closest(".grille"); }, {passive:true});
+addEventListener("touchend", e => {
+  if(y0 === null) return; const dy = e.changedTouches[0].clientY - y0; y0 = null;
+  if(!$("sms").hidden || !$("reglages").hidden) return;
+  if(dy < -70 && !tiroir.classList.contains("ouvert")) ouvrirTiroir();
+  else if(dy > 90 && tiroir.classList.contains("ouvert") && (!surGrille || $("grille").scrollTop <= 0)) fermerTiroir();
+}, {passive:true});
+
+/* ---------- SMS ---------- */
+$("form").addEventListener("submit", e => {
+  e.preventDefault();
+  const txt = $("texte").value.trim(), num = $("numero").value.trim();
+  if(!txt) return;
+  if(!num){ $("numero").focus(); $("numero").placeholder = "il me faut un numéro…"; vibrer(40); return; }
+  const aide = $("aide"); if(aide) aide.remove();
+  surgir("le démon l'emporte");
+  const b = document.createElement("div"); b.className = "bulle part"; b.textContent = txt;
+  const s = document.createElement("div"); s.className = "etat"; s.textContent = "à " + num + " · en route…";
+  setTimeout(() => { $("fil").append(b, s); $("fil").scrollTop = $("fil").scrollHeight; }, 450);
+  setTimeout(() => { s.textContent = "à " + num + " · prêt dans Messages 👁"; if(A) A.envoyerSms(num, txt); }, 1200);
+  $("texte").value = "";
+});
+
+/* ---------- Braises ---------- */
+const c = $("braises"), x = c.getContext("2d"); let W, H, raf;
+const pts = Array.from({length:42}, () => ({x:Math.random(), y:Math.random(), v:.0006+Math.random()*.0016, r:Math.random()*1.8+.4, a:Math.random()}));
+function taille(){ W = c.width = innerWidth*devicePixelRatio; H = c.height = innerHeight*devicePixelRatio; }
+taille(); addEventListener("resize", taille);
+function braises(){
+  cancelAnimationFrame(raf);
+  (function dessine(){
+    x.clearRect(0,0,W,H);
+    for(const p of pts){ p.y -= p.v; p.x += Math.sin(p.y*20+p.a*9)*.0004; if(p.y<0){ p.y = 1; p.x = Math.random(); }
+      x.fillStyle = `rgba(224,${38+p.a*40|0},43,${.15+p.a*.5*p.y})`; x.beginPath(); x.arc(p.x*W, p.y*H, p.r*devicePixelRatio, 0, 7); x.fill(); }
+    if(opt.braises && !document.hidden) raf = requestAnimationFrame(dessine);
+  })();
+}
+document.addEventListener("visibilitychange", () => { if(!document.hidden && opt.braises) braises(); });
+if(matchMedia("(prefers-reduced-motion: reduce)").matches) document.body.classList.add("calme");
+
+/* ---------- Démarrage ---------- */
+appliquerOptions();
+braises();
+if(A) A.listerApplis(); else lexos.recevoirApplis(EXEMPLES);
+})();
 </script>
-
 </body>
 </html>

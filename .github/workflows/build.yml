@@ -37,8 +37,8 @@ jobs:
       - name: Publier dans Releases
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: lexos-demon
-          name: LexOS Démon
-          body: Thème démon animé pour Android (yeux, braises, animation à l'envoi de SMS).
+          tag_name: lexos-demon-v${{ github.run_number }}
+          name: LexOS Démon 2.0 (build ${{ github.run_number }})
+          body: Lanceur Android complet thème démon — toutes les applis, recherche, dock personnalisable, batterie, SMS avec animation, réglages.
           files: lexos-demon.apk
           make_latest: true
