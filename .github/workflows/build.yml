@@ -1,0 +1,44 @@
+name: Construire l'APK LexOS Démon
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: "8.9"
+
+      - name: Compiler
+        run: gradle :app:assembleDebug --no-daemon
+
+      - name: Renommer
+        run: cp app/build/outputs/apk/debug/app-debug.apk lexos-demon.apk
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lexos-demon
+          path: lexos-demon.apk
+
+      - name: Publier dans Releases
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: lexos-demon
+          name: LexOS Démon
+          body: Thème démon animé pour Android (yeux, braises, animation à l'envoi de SMS).
+          files: lexos-demon.apk
+          make_latest: true

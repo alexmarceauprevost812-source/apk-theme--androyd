@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>LexOS Démon</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+html,body{margin:0}button{-webkit-tap-highlight-color:transparent}
+/* Layout : un écran d'accueil Android plein noir, yeux au centre, dock en bas */
+:root{
+  --noir:#000; --braise:#0d0607; --rouge:#e0262b; --sang:#7a0d12; --cendre:#8a7a7c; --os:#f1e9ea;
+  --display:"Rajdhani",system-ui,sans-serif; --mono:"JetBrains Mono",ui-monospace,monospace;
+  color-scheme:dark;
+}
+html,body{height:100%}
+body{background:var(--noir);color:var(--os);font-family:var(--mono);overflow:hidden;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  -webkit-tap-highlight-color:transparent;user-select:none}
+canvas#braises{position:fixed;inset:0;width:100%;height:100%;z-index:0}
+.ecran{position:relative;z-index:1;height:100%;display:flex;flex-direction:column;max-width:460px;margin:0 auto}
+.haut{display:flex;justify-content:space-between;font-size:12px;color:var(--cendre);padding-block:10px}
+.heure{text-align:center;margin-top:4vh}
+.heure b{font-family:var(--display);font-weight:700;font-size:64px;letter-spacing:.04em;color:var(--os);display:block;line-height:1}
+.heure span{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--rouge)}
+.zone{flex:1;display:grid;place-items:center;position:relative}
+.yeux{display:flex;gap:44px;position:relative;filter:drop-shadow(0 0 14px rgba(224,38,43,.55));transition:transform .25s ease}
+.oeil{width:120px;height:62px;position:relative;overflow:hidden}
+.oeil svg{width:100%;height:100%;display:block}
+.paupiere{transform-origin:50% 0;animation:cligne 5.5s infinite}
+.oeil.d{transform:scaleX(-1)}
+.pupille{transition:transform .12s linear}
+.yeux.colere .oeil{animation:tremble .08s linear 6}
+.yeux.colere{filter:drop-shadow(0 0 28px rgba(255,40,40,.95))}
+@keyframes cligne{0%,92%,100%{transform:scaleY(0)}95%{transform:scaleY(1)}}
+@keyframes tremble{50%{translate:2px -1px}}
+.lueur{position:absolute;width:300px;height:140px;border-radius:50%;background:radial-gradient(closest-side,rgba(224,38,43,.18),transparent);animation:respire 3.2s ease-in-out infinite}
+@keyframes respire{50%{opacity:.35;transform:scale(1.15)}}
+.murmure{position:absolute;bottom:14%;font-size:12px;color:var(--cendre);letter-spacing:.06em;min-height:1.2em;text-align:center}
+.murmure::before{content:"> ";color:var(--rouge)}
+.dock{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding-block:14px 18px;border-top:1px solid #1d1012}
+.app{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:11px;color:var(--cendre);background:none;border:0;font-family:var(--mono);cursor:pointer}
+.app i{width:52px;height:52px;border-radius:16px;background:var(--braise);border:1px solid var(--sang);display:grid;place-items:center;font-style:normal;font-size:22px;color:var(--rouge);transition:box-shadow .2s,transform .15s}
+.app:active i,.app:focus-visible i{box-shadow:0 0 18px var(--rouge);transform:scale(.94);outline:none}
+.app:focus-visible{outline:none}
+.astuce{font-size:10px;color:#4d3f41;text-align:center;padding-bottom:6px}
+/* SMS */
+.sms{position:fixed;inset:0;z-index:5;background:var(--noir);display:flex;flex-direction:column;max-width:460px;margin:0 auto;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.sms header{display:flex;align-items:center;gap:12px;padding-block:14px;border-bottom:1px solid #1d1012}
+.sms header button{background:none;border:0;color:var(--rouge);font-size:22px;cursor:pointer}
+.sms header b{font-family:var(--display);font-size:20px;letter-spacing:.05em}
+.sms header small{display:block;font-size:10px;color:var(--cendre)}
+.fil{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:10px;padding-block:16px}
+.bulle{max-width:78%;padding:10px 14px;border-radius:16px;font-size:13px;line-height:1.4;overflow-wrap:anywhere}
+.bulle.eux{align-self:flex-start;background:#151012;border:1px solid #2a1a1c}
+.bulle.moi{align-self:flex-end;background:var(--braise);border:1px solid var(--rouge);color:var(--os)}
+.bulle.moi.part{animation:brule 1.1s ease-out}
+.etat{align-self:flex-end;font-size:10px;color:var(--rouge);margin-top:-6px}
+@keyframes brule{0%{transform:translateY(30px) scale(.9);opacity:0;box-shadow:0 0 0 var(--rouge)}
+  40%{opacity:1;box-shadow:0 0 30px var(--rouge);border-color:#ff6a3d}100%{box-shadow:0 0 0 transparent}}
+.saisie{display:flex;gap:10px;padding-block:12px 18px}
+.saisie input{flex:1;min-width:0;background:#0f0a0b;border:1px solid #2a1a1c;border-radius:22px;color:var(--os);padding:12px 16px;font-family:var(--mono);font-size:13px}
+.saisie input:focus{outline:none;border-color:var(--rouge)}
+.saisie button{width:46px;height:46px;border-radius:50%;border:0;background:var(--rouge);color:#000;font-size:20px;cursor:pointer}
+/* Yeux qui surgissent à l'envoi */
+.surgit{position:fixed;inset:0;z-index:9;display:grid;place-items:center;background:rgba(0,0,0,.85);pointer-events:none;opacity:0}
+.surgit.on{animation:surgit 1.3s ease-out}
+.surgit .yeux{transform:scale(1.3)}
+.surgit .paupiere{animation:ouvre 1.3s ease-out}
+@keyframes surgit{0%{opacity:0}15%,70%{opacity:1}100%{opacity:0}}
+@keyframes ouvre{0%{transform:scaleY(1)}30%,100%{transform:scaleY(0)}}
+@media (prefers-reduced-motion:reduce){.paupiere,.lueur{animation:none}.pupille{transition:none}}
+</style>
+
+</head>
+<body>
+<canvas id="braises"></canvas>
+<div class="ecran">
+  <div class="haut"><span>lexos://démon</span><span id="batt">▮▮▮▯ 78%</span></div>
+  <div class="heure"><b id="h">04:13</b><span id="d">jeudi 29 oct.</span></div>
+  <div class="zone" id="zone">
+    <div class="lueur"></div>
+    <div class="yeux" id="yeux">
+      <div class="oeil g"><svg viewBox="0 0 120 62">
+        <defs><clipPath id="cg"><path d="M2 4 Q60 -2 118 28 Q70 70 2 4Z"/></clipPath></defs>
+        <path d="M2 4 Q60 -2 118 28 Q70 70 2 4Z" fill="#e0262b"/>
+        <g clip-path="url(#cg)"><ellipse class="pupille" cx="58" cy="26" rx="5" ry="15" fill="#e0262b"/>
+        <rect class="paupiere" x="0" y="0" width="120" height="62" fill="#000"/></g></svg></div>
+      <div class="oeil d"><svg viewBox="0 0 120 62">
+        <defs><clipPath id="cd"><path d="M2 4 Q60 -2 118 28 Q70 70 2 4Z"/></clipPath></defs>
+        <path d="M2 4 Q60 -2 118 28 Q70 70 2 4Z" fill="#e0262b"/>
+        <g clip-path="url(#cd)"><ellipse class="pupille" cx="58" cy="26" rx="5" ry="15" fill="#e0262b"/>
+        <rect class="paupiere" x="0" y="0" width="120" height="62" fill="#000"/></g></svg></div>
+    </div>
+    <div class="murmure" id="m">je te regarde…</div>
+  </div>
+  <nav class="dock">
+    <button class="app" type="button" data-app="appel"><i>☎</i>Appel</button>
+    <button class="app" type="button" id="ouvrirSms"><i>✉</i>SMS</button>
+    <button class="app" type="button" data-app="photo"><i>◎</i>Photo</button>
+    <button class="app" type="button"><i>⌘</i>Labo</button>
+  </nav>
+  <div class="astuce">bouge ton doigt · touche les yeux pour le fâcher</div>
+</div>
+
+<section class="sms" id="sms" hidden>
+  <header><button type="button" id="retour" aria-label="Retour">‹</button><div><b>Message</b><input id="numero" type="tel" inputmode="tel" placeholder="numéro…" autocomplete="off" style="background:none;border:0;border-bottom:1px solid #2a1a1c;color:#f1e9ea;font-family:inherit;font-size:12px;padding:2px 0;width:100%"></div></header>
+  <div class="fil" id="fil">
+    <div class="bulle eux">T'es encore debout à 4 h du matin? 😅</div>
+    <div class="bulle moi">Je code mon téléphone LexOS 🔥</div>
+    <div class="etat">livré</div>
+    <div class="bulle eux">Va dormir!</div>
+  </div>
+  <form class="saisie" id="form">
+    <input id="texte" type="text" placeholder="Écris au démon…" autocomplete="off">
+    <button type="submit" aria-label="Envoyer">➤</button>
+  </form>
+</section>
+
+<div class="surgit" id="surgit">
+  <div class="yeux">
+    <div class="oeil g"><svg viewBox="0 0 120 62"><defs><clipPath id="sg"><path d="M2 4 Q60 -2 118 28 Q70 70 2 4Z"/></clipPath></defs>
+      <path d="M2 4 Q60 -2 118 28 Q70 70 2 4Z" fill="#e0262b"/><g clip-path="url(#sg)"><ellipse cx="58" cy="26" rx="3" ry="15" fill="#e0262b"/>
+      <rect class="paupiere" x="0" y="0" width="120" height="62" fill="#000"/></g></svg></div>
+    <div class="oeil d"><svg viewBox="0 0 120 62"><defs><clipPath id="sd"><path d="M2 4 Q60 -2 118 28 Q70 70 2 4Z"/></clipPath></defs>
+      <path d="M2 4 Q60 -2 118 28 Q70 70 2 4Z" fill="#e0262b"/><g clip-path="url(#sd)"><ellipse cx="58" cy="26" rx="3" ry="15" fill="#e0262b"/>
+      <rect class="paupiere" x="0" y="0" width="120" height="62" fill="#000"/></g></svg></div>
+  </div>
+</div>
+
+<script>
+// SMS : envoi avec animation démon
+const sms=document.getElementById("sms"),fil=document.getElementById("fil"),surgit=document.getElementById("surgit");
+document.getElementById("ouvrirSms").addEventListener("click",()=>{sms.hidden=false;fil.scrollTop=fil.scrollHeight;});
+document.getElementById("retour").addEventListener("click",()=>{sms.hidden=true;});
+document.getElementById("form").addEventListener("submit",e=>{
+  e.preventDefault();const champ=document.getElementById("texte"),txt=champ.value.trim();if(!txt)return;
+  surgit.classList.remove("on");void surgit.offsetWidth;surgit.classList.add("on");
+  const b=document.createElement("div");b.className="bulle moi part";b.textContent=txt;
+  const s=document.createElement("div");s.className="etat";s.textContent="le démon l'emporte…";
+  setTimeout(()=>{fil.append(b,s);fil.scrollTop=fil.scrollHeight;},500);
+  setTimeout(()=>{s.textContent="livré 👁‍🗨";},1700);
+  const num=document.getElementById("numero").value.trim();
+  vibrer(60);
+  if(window.Android&&num)setTimeout(()=>Android.envoyerSms(num,txt),1400);
+  champ.value="";
+});
+function vibrer(ms){try{if(window.Android)Android.vibrer(ms);else if(navigator.vibrate)navigator.vibrate(ms);}catch(e){}}
+window.retourAndroid=()=>{sms.hidden=true;};
+document.querySelectorAll("[data-app]").forEach(b=>b.addEventListener("click",()=>{if(window.Android)Android.ouvrirAppli(b.dataset.app);}));
+
+// Heure
+const jours=["dim.","lun.","mar.","mer.","jeu.","ven.","sam."];
+function tic(){const n=new Date();document.getElementById("h").textContent=String(n.getHours()).padStart(2,"0")+":"+String(n.getMinutes()).padStart(2,"0");
+document.getElementById("d").textContent=n.toLocaleDateString("fr-CA",{weekday:"long",day:"numeric",month:"short"});}
+tic();setInterval(tic,10000);
+
+// Pupilles qui suivent le doigt
+const yeux=document.getElementById("yeux"),pupilles=[...document.querySelectorAll(".pupille")];
+function suivre(x,y){const r=yeux.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;
+  const dx=Math.max(-1,Math.min(1,(x-cx)/220)),dy=Math.max(-1,Math.min(1,(y-cy)/220));
+  pupilles.forEach((p,i)=>{const s=i?-1:1;p.style.transform=`translate(${dx*22*s}px,${dy*6}px)`;});
+  yeux.style.transform=`translate(${dx*6}px,${dy*4}px)`;}
+addEventListener("pointermove",e=>suivre(e.clientX,e.clientY));
+let t=0;(function errer(){if(!matchMedia("(prefers-reduced-motion:reduce)").matches){t+=.01;}
+  requestAnimationFrame(errer)})();
+
+// Colère au toucher
+const phrases=["ne me touche pas.","tu as réveillé LexOS.","…","le démon a faim de batterie.","encore une fois et je ferme tes applis."];
+const m=document.getElementById("m");let i=0;
+yeux.addEventListener("click",()=>{yeux.classList.remove("colere");void yeux.offsetWidth;yeux.classList.add("colere");
+  pupilles.forEach(p=>p.setAttribute("rx","2.5"));vibrer(90);m.textContent=phrases[i++%phrases.length];
+  setTimeout(()=>{yeux.classList.remove("colere");pupilles.forEach(p=>p.setAttribute("rx","5"));},1400);});
+
+// Braises qui montent
+const c=document.getElementById("braises"),x=c.getContext("2d");let W,H,pts=[];
+function taille(){W=c.width=innerWidth*devicePixelRatio;H=c.height=innerHeight*devicePixelRatio;}
+taille();addEventListener("resize",taille);
+for(let k=0;k<45;k++)pts.push({x:Math.random(),y:Math.random(),v:.0006+Math.random()*.0016,r:Math.random()*1.8+.4,a:Math.random()});
+(function dessine(){x.clearRect(0,0,W,H);
+  pts.forEach(p=>{p.y-=p.v;p.x+=Math.sin(p.y*20+p.a*9)*.0004;if(p.y<0){p.y=1;p.x=Math.random();}
+    x.fillStyle=`rgba(224,${38+p.a*40|0},43,${.15+p.a*.5*p.y})`;x.beginPath();x.arc(p.x*W,p.y*H,p.r*devicePixelRatio,0,7);x.fill();});
+  if(!matchMedia("(prefers-reduced-motion:reduce)").matches)requestAnimationFrame(dessine);})();
+</script>
+
+</body>
+</html>
