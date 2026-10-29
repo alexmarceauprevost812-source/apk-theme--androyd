@@ -50,6 +50,10 @@ canvas#braises{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-e
 .app span{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .app:active .ic{box-shadow:0 0 18px var(--rouge);transform:scale(.92)}
 
+/* Applis sur l'accueil */
+.grilleAccueil{display:grid;grid-template-columns:repeat(4,1fr);gap:16px 8px;padding-bottom:16px}
+.zone{min-height:150px}
+
 /* Tiroir */
 #tiroir{background:rgba(0,0,0,.97);transform:translateY(100%);transition:transform .32s cubic-bezier(.2,.8,.2,1);z-index:3}
 #tiroir.ouvert{transform:none}
@@ -85,6 +89,61 @@ canvas#braises{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-e
 .saisie input{flex:1;min-width:0;background:#0f0a0b;border:1px solid #2a1a1c;border-radius:22px;color:var(--os);padding:12px 16px;font-family:var(--mono);font-size:13px}
 .saisie input:focus{outline:none;border-color:var(--rouge)}
 .saisie button{width:46px;height:46px;border-radius:50%;background:var(--rouge);color:#000;font-size:20px}
+
+/* Yeux au centre de l'écran SMS */
+#sms .fil,#sms .tete,#sms .saisie{position:relative;z-index:1}
+.yeuxSms{position:absolute;left:50%;top:46%;transform:translate(-50%,-50%) scale(.85);opacity:.28;z-index:0;pointer-events:none;transition:opacity .3s}
+.yeuxSms.mange{animation:mange 1.4s ease-out}
+.yeuxSms.mange .yeux{filter:drop-shadow(0 0 34px rgba(255,40,40,1))}
+.yeuxSms.mange .paupiere{animation:ouvre 1.4s ease-out}
+.vole{position:fixed;z-index:8;max-width:70%;padding:10px 14px;border-radius:16px;font-size:13px;background:var(--braise);border:1px solid var(--rouge);color:var(--os);
+  pointer-events:none;transition:transform .7s cubic-bezier(.5,0,.75,0),opacity .7s ease-in;box-shadow:0 0 24px var(--rouge);overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+@keyframes mange{0%{opacity:.28;transform:translate(-50%,-50%) scale(.85)}
+  25%{opacity:1;transform:translate(-50%,-50%) scale(1.25)}
+  45%{transform:translate(-50%,-50%) scale(1.45) translateX(3px)}
+  50%{transform:translate(-50%,-50%) scale(1.45) translateX(-3px)}
+  60%{opacity:1;transform:translate(-50%,-50%) scale(1.4)}
+  100%{opacity:.28;transform:translate(-50%,-50%) scale(.85)}}
+
+/* Agenda démoniaque */
+#agenda{background:var(--noir);z-index:4}
+.moisBarre{display:flex;align-items:center;justify-content:space-between;padding:14px 0 10px}
+.moisBarre b{font-family:var(--display);font-size:22px;letter-spacing:.06em;text-transform:capitalize}
+.moisBarre button{width:38px;height:38px;border-radius:50%;border:1px solid var(--sang);color:var(--rouge);font-size:18px}
+.jsem,.mois{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center}
+.jsem{font-size:10px;color:var(--cendre);letter-spacing:.1em;padding-bottom:6px}
+.jour{aspect-ratio:1;max-width:100%;border-radius:12px;font-size:13px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--os);position:relative;font-variant-numeric:tabular-nums}
+.jour.autre{color:#3d2f31}
+.jour.auj{border:1px solid var(--rouge);box-shadow:0 0 12px rgba(224,38,43,.5) inset}
+.jour.choisi{background:var(--rouge);color:#000;font-weight:600}
+.jour i{width:5px;height:5px;border-radius:50%;background:var(--rouge);box-shadow:0 0 6px var(--rouge)}
+.jour.choisi i{background:#000;box-shadow:none}
+.jourTitre{display:flex;justify-content:space-between;align-items:baseline;padding:16px 0 8px;border-bottom:1px solid var(--ligne)}
+.jourTitre b{font-family:var(--display);font-size:18px;letter-spacing:.04em}
+.jourTitre small{color:var(--rouge);font-size:10px;letter-spacing:.12em;text-transform:uppercase}
+.evts{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding:10px 0 80px}
+.evt{display:grid;grid-template-columns:52px 1fr auto;gap:10px;align-items:center;background:var(--braise);border:1px solid var(--sang);border-radius:14px;padding:10px 12px}
+.evt time{font-size:12px;color:var(--rouge);font-variant-numeric:tabular-nums}
+.evt b{font-size:13px;font-weight:600;display:block;overflow-wrap:anywhere}
+.evt small{font-size:11px;color:var(--cendre)}
+.evt button{color:var(--cendre);font-size:16px;padding:4px 6px}
+.evtVide{text-align:center;color:var(--cendre);font-size:12px;padding:24px 0;line-height:1.6}
+.fab{position:fixed;right:max(20px,calc(env(safe-area-inset-right,0px) + 20px));bottom:calc(env(safe-area-inset-bottom,0px) + 22px);width:58px;height:58px;border-radius:50%;background:var(--rouge);color:#000;font-size:30px;box-shadow:0 0 24px rgba(224,38,43,.7);z-index:5}
+#formEvt{position:fixed;inset:0;z-index:6;background:rgba(0,0,0,.75);display:flex;align-items:flex-end}
+#formEvt form{width:100%;max-width:480px;margin:0 auto;background:#0b0607;border-top:1px solid var(--rouge);border-radius:18px 18px 0 0;padding:16px 18px calc(env(safe-area-inset-bottom,0px) + 16px);display:flex;flex-direction:column;gap:10px}
+#formEvt h3{margin:0;font-family:var(--display);font-size:20px;letter-spacing:.05em}
+#formEvt label{font-size:11px;color:var(--cendre);display:flex;flex-direction:column;gap:4px}
+#formEvt input{background:#0f0a0b;border:1px solid #2a1a1c;border-radius:12px;color:var(--os);padding:11px 12px;font-family:var(--mono);font-size:13px}
+#formEvt input:focus{outline:none;border-color:var(--rouge)}
+.deux{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.actions{display:flex;gap:10px;justify-content:flex-end;padding-top:4px}
+.actions button{padding:11px 16px;border-radius:22px;font-size:13px;border:1px solid var(--sang)}
+.actions button[type=submit]{background:var(--rouge);color:#000;border:0;font-weight:600}
+.telCase{flex-direction:row!important;align-items:center;gap:10px!important;font-size:12px!important;color:var(--os)!important}
+.telCase input{accent-color:var(--rouge);width:18px;height:18px}
+.rituel{margin-top:10px;text-align:center;font-size:11px;color:var(--cendre);cursor:pointer}
+.rituel b{color:var(--os);font-weight:600}
+.rituel::before{content:"⛧ ";color:var(--rouge)}
 
 /* Réglages */
 #reglages{background:var(--noir);z-index:4}
@@ -126,12 +185,13 @@ canvas#braises{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-e
 <!-- ACCUEIL -->
 <section class="vue" id="accueil">
   <div class="haut"><span>lexos://démon</span><span id="batt" class="r">▮▮▮▯ --%</span></div>
-  <div class="heure"><b id="h">00:00</b><span id="d">…</span></div>
+  <div class="heure"><b id="h">00:00</b><span id="d">…</span><div class="rituel" id="rituel">…</div></div>
   <div class="zone" id="zone">
     <div class="lueur"></div>
     <div id="yeuxAccueil"></div>
     <div class="murmure" id="m">je te regarde…</div>
   </div>
+  <div class="grilleAccueil" id="grilleAccueil"></div>
   <nav class="dock" id="dock"></nav>
   <div class="monter" id="monter">TOUTES LES APPLIS</div>
 </section>
@@ -152,12 +212,37 @@ canvas#braises{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-e
     <button type="button" data-retour aria-label="Retour">‹</button>
     <div style="flex:1;min-width:0"><b>Message</b><input id="numero" type="tel" inputmode="tel" placeholder="numéro du destinataire" autocomplete="off"></div>
   </div>
+  <div class="yeuxSms" id="yeuxSms" aria-hidden="true"></div>
   <div class="fil" id="fil"><p class="aide" id="aide">Écris le numéro, puis ton message.<br>Le démon l'emporte, puis Messages s'ouvre<br>avec le texte prêt à partir.</p></div>
   <form class="saisie" id="form">
     <input id="texte" type="text" placeholder="Écris au démon…" autocomplete="off">
     <button type="submit" aria-label="Envoyer">➤</button>
   </form>
 </section>
+
+<!-- AGENDA -->
+<section class="vue" id="agenda" hidden>
+  <div class="tete"><button type="button" data-retour aria-label="Retour">‹</button><b>Agenda démoniaque</b></div>
+  <div class="moisBarre"><button type="button" id="moisPrec" aria-label="Mois précédent">‹</button><b id="moisNom">…</b><button type="button" id="moisSuiv" aria-label="Mois suivant">›</button></div>
+  <div class="jsem"><span>L</span><span>M</span><span>M</span><span>J</span><span>V</span><span>S</span><span>D</span></div>
+  <div class="mois" id="mois"></div>
+  <div class="jourTitre"><b id="jourNom">…</b><small id="jourCompte"></small></div>
+  <div class="evts" id="evts"></div>
+  <button type="button" class="fab" id="nouvelEvt" aria-label="Nouveau rendez-vous">+</button>
+</section>
+<div id="formEvt" hidden>
+  <form id="evtForm">
+    <h3>Nouveau pacte</h3>
+    <label>Titre<input id="evtTitre" type="text" required placeholder="ex. Dentiste, souper chez maman…" autocomplete="off"></label>
+    <div class="deux">
+      <label>Date<input id="evtDate" type="date" required></label>
+      <label>Heure<input id="evtHeure" type="time" value="09:00"></label>
+    </div>
+    <label>Lieu<input id="evtLieu" type="text" placeholder="facultatif" autocomplete="off"></label>
+    <label class="telCase" id="telCaseL"><input id="evtTel" type="checkbox" checked>Ajouter aussi dans l'agenda du téléphone</label>
+    <div class="actions"><button type="button" id="evtAnnuler">Annuler</button><button type="submit">Sceller</button></div>
+  </form>
+</div>
 
 <!-- RÉGLAGES -->
 <section class="vue" id="reglages" hidden>
@@ -199,7 +284,7 @@ function appliquerOptions(){
   $("optSurgit").checked = opt.surgit; $("optVibre").checked = opt.vibre;
   document.body.classList.toggle("vraies", opt.couleurs);
   $("braises").hidden = !opt.braises;
-  rendreGrille(); rendreDock();
+  rendreGrille(); rendreDock(); if(typeof rendreAccueil === "function") rendreAccueil();
 }
 [["optCouleurs","couleurs"],["optBraises","braises"],["optSurgit","surgit"],["optVibre","vibre"]].forEach(([id,k])=>{
   $(id).addEventListener("change", e => { opt[k] = e.target.checked; ecrire("opt",opt); appliquerOptions(); if(k==="braises"&&opt.braises) braises(); });
@@ -210,6 +295,7 @@ const vibrer = ms => { if(!opt.vibre) return; try { A ? A.vibrer(ms) : navigator
 const tpl = $("tplYeux");
 $("yeuxAccueil").appendChild(tpl.content.cloneNode(true));
 $("yeuxSurgit").appendChild(tpl.content.cloneNode(true));
+$("yeuxSms").appendChild(tpl.content.cloneNode(true));
 const yeux = $("yeuxAccueil").querySelector(".yeux");
 addEventListener("pointermove", e => {
   const r = yeux.getBoundingClientRect(), cx = r.left+r.width/2, cy = r.top+r.height/2;
@@ -243,9 +329,9 @@ tic(); setInterval(tic, 15000);
 let applis = [];
 const EXEMPLES = ["Appareil photo","Calculatrice","Chrome","Galerie","Horloge","Maps","Messages","Musique","Paramètres","Play Store","Spotify","Téléphone","Termux","YouTube"]
   .map(n => ({nom:n, pkg:"ex."+n, icone:""}));
-const SYSTEME = {appel:{nom:"Appel",car:"☎"}, sms:{nom:"SMS",car:"✉"}, photo:{nom:"Photo",car:"◎"}, web:{nom:"Web",car:"⌁"}};
-const DOCK_DEFAUT = ["sys:appel","sys:sms","sys:photo","sys:web","lexos:tiroir"];
-let dock = lire("dock", DOCK_DEFAUT);
+const SYSTEME = {appel:{nom:"Appel",car:"☎"}, sms:{nom:"SMS",car:"✉"}, photo:{nom:"Photo",car:"◎"}, web:{nom:"Web",car:"⌁"}, agenda:{nom:"Agenda",car:"⛧"}};
+const DOCK_DEFAUT = ["sys:appel","sys:sms","sys:agenda","sys:photo","lexos:tiroir"];
+let dock = lire("dock2", DOCK_DEFAUT);
 
 function icone(app){
   const b = document.createElement("button");
@@ -284,11 +370,29 @@ function rendreGrille(){
   });
 }
 
+let surAccueil = lire("accueilApps", null);
+function rendreAccueil(){
+  const g = $("grilleAccueil"); g.textContent = "";
+  const liste = (surAccueil ? surAccueil.map(p => applis.find(a => a.pkg === p)).filter(Boolean) : applis.slice(0, 8)).slice(0, 8);
+  liste.forEach(app => {
+    const b = icone(app);
+    b.addEventListener("click", () => ouvrirAppli(app));
+    brancherAppuiLong(b, () => menuAppli(app));
+    g.appendChild(b);
+  });
+}
+function basculerAccueil(pkg){
+  const actuel = surAccueil || applis.slice(0, 8).map(a => a.pkg);
+  if(actuel.includes(pkg)) surAccueil = actuel.filter(p => p !== pkg);
+  else { if(actuel.length >= 8) actuel.pop(); surAccueil = actuel.concat(pkg); }
+  ecrire("accueilApps", surAccueil); rendreAccueil(); vibrer(30);
+}
+
 function rendreDock(){
   const d = $("dock"); d.textContent = "";
   dock.forEach((cle, i) => {
     let app, action;
-    if(cle.startsWith("sys:")){ const k = cle.slice(4); app = SYSTEME[k]; action = () => k === "sms" ? ouvrirVue("sms") : (opt.surgit && surgir(app.nom), setTimeout(()=>A && A.ouvrirSysteme(k), opt.surgit?650:0)); }
+    if(cle.startsWith("sys:")){ const k = cle.slice(4); app = SYSTEME[k]; action = () => k === "sms" ? ouvrirVue("sms") : k === "agenda" ? ouvrirAgenda() : (opt.surgit && surgir(app.nom), setTimeout(()=>A && A.ouvrirSysteme(k), opt.surgit?650:0)); }
     else if(cle === "lexos:tiroir"){ app = {nom:"Applis", car:"⌘"}; action = ouvrirTiroir; }
     else { app = applis.find(a => a.pkg === cle); if(!app) app = {nom:"?", car:"+"}; action = () => app.pkg && ouvrirAppli(app); }
     const b = icone(app); b.addEventListener("click", action);
@@ -298,10 +402,10 @@ function rendreDock(){
 }
 
 window.lexos = {
-  recevoirApplis(liste){ applis = liste; rendreGrille(); rendreDock(); },
+  recevoirApplis(liste){ applis = liste; rendreGrille(); rendreDock(); rendreAccueil(); },
   rechargerApplis(){ A && A.listerApplis(); },
   accueil(){ fermerTout(); },
-  retour(){ if(!$("menu").hidden) $("menu").hidden = true; else if(!$("sms").hidden || !$("reglages").hidden) fermerVues(); else fermerTiroir(); },
+  retour(){ if(!$("menu").hidden) $("menu").hidden = true; else if(!$("formEvt").hidden) $("formEvt").hidden = true; else if(!$("sms").hidden || !$("reglages").hidden || !$("agenda").hidden) fermerVues(); else fermerTiroir(); },
   reveil(){ tic(); majEtatAccueil(); },
   surgir
 };
@@ -318,7 +422,9 @@ function feuille(titre, actions){
 }
 $("menu").addEventListener("click", e => { if(e.target.id === "menu") $("menu").hidden = true; });
 function menuAppli(app){
+  const dejà = (surAccueil || applis.slice(0, 8).map(a => a.pkg)).includes(app.pkg);
   feuille(app.nom, [
+    [dejà ? "Retirer de l'accueil" : "Mettre sur l'accueil", () => basculerAccueil(app.pkg)],
     ["Mettre dans le dock", () => choisirPlaceDock(app.pkg)],
     ["Infos de l'appli", () => A && A.infosAppli(app.pkg)],
     ["Désinstaller", () => A && A.desinstaller(app.pkg)]
@@ -327,23 +433,23 @@ function menuAppli(app){
 function choisirPlaceDock(pkg){
   feuille("Remplacer quelle place du dock?", dock.map((cle, i) => {
     const nom = cle.startsWith("sys:") ? SYSTEME[cle.slice(4)].nom : cle === "lexos:tiroir" ? "Applis" : (applis.find(a=>a.pkg===cle)||{nom:"?"}).nom;
-    return [`${i+1}. ${nom}`, () => { dock[i] = pkg; ecrire("dock", dock); rendreDock(); fermerTiroir(); }];
+    return [`${i+1}. ${nom}`, () => { dock[i] = pkg; ecrire("dock2", dock); rendreDock(); fermerTiroir(); }];
   }));
 }
 function menuDock(i){
   feuille("Place " + (i+1) + " du dock", [
     ["Choisir une appli…", () => { ouvrirTiroir(); $("compte").textContent = "appui long sur une appli → Mettre dans le dock"; }],
-    ["Remettre par défaut", () => { dock[i] = DOCK_DEFAUT[i]; ecrire("dock", dock); rendreDock(); }]
+    ["Remettre par défaut", () => { dock[i] = DOCK_DEFAUT[i]; ecrire("dock2", dock); rendreDock(); }]
   ]);
 }
-$("resetDock").addEventListener("click", () => { dock = DOCK_DEFAUT.slice(); ecrire("dock", dock); rendreDock(); vibrer(40); });
+$("resetDock").addEventListener("click", () => { dock = DOCK_DEFAUT.slice(); ecrire("dock2", dock); rendreDock(); vibrer(40); });
 
 /* ---------- Navigation ---------- */
 const tiroir = $("tiroir");
 function ouvrirTiroir(){ tiroir.classList.add("ouvert"); }
 function fermerTiroir(){ tiroir.classList.remove("ouvert"); $("cherche").value = ""; $("cherche").blur(); rendreGrille(); }
 function ouvrirVue(id){ $(id).hidden = false; if(id === "reglages") majEtatAccueil(); }
-function fermerVues(){ $("sms").hidden = true; $("reglages").hidden = true; }
+function fermerVues(){ $("sms").hidden = true; $("reglages").hidden = true; $("agenda").hidden = true; $("formEvt").hidden = true; }
 function fermerTout(){ $("menu").hidden = true; fermerVues(); fermerTiroir(); }
 $("monter").addEventListener("click", ouvrirTiroir);
 $("versReglages").addEventListener("click", () => ouvrirVue("reglages"));
@@ -363,7 +469,7 @@ let y0 = null, surGrille = false;
 addEventListener("touchstart", e => { y0 = e.touches[0].clientY; surGrille = !!e.target.closest(".grille"); }, {passive:true});
 addEventListener("touchend", e => {
   if(y0 === null) return; const dy = e.changedTouches[0].clientY - y0; y0 = null;
-  if(!$("sms").hidden || !$("reglages").hidden) return;
+  if(!$("sms").hidden || !$("reglages").hidden || !$("agenda").hidden) return;
   if(dy < -70 && !tiroir.classList.contains("ouvert")) ouvrirTiroir();
   else if(dy > 90 && tiroir.classList.contains("ouvert") && (!surGrille || $("grille").scrollTop <= 0)) fermerTiroir();
 }, {passive:true});
@@ -375,11 +481,20 @@ $("form").addEventListener("submit", e => {
   if(!txt) return;
   if(!num){ $("numero").focus(); $("numero").placeholder = "il me faut un numéro…"; vibrer(40); return; }
   const aide = $("aide"); if(aide) aide.remove();
-  surgir("le démon l'emporte");
+  // Le message vole jusqu'aux yeux au centre de l'écran
+  const ys = $("yeuxSms"), champ = $("texte").getBoundingClientRect(), cible = ys.getBoundingClientRect();
+  const v = document.createElement("div"); v.className = "vole"; v.textContent = txt;
+  v.style.left = champ.left + "px"; v.style.top = champ.top + "px"; document.body.appendChild(v);
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    const vr = v.getBoundingClientRect();
+    const dx = cible.left + cible.width/2 - (vr.left + vr.width/2), dy = cible.top + cible.height/2 - (vr.top + vr.height/2);
+    v.style.transform = `translate(${dx}px,${dy}px) scale(.08)`; v.style.opacity = "0";
+  }));
+  setTimeout(() => { v.remove(); ys.classList.remove("mange"); void ys.offsetWidth; ys.classList.add("mange"); vibrer(80); }, 650);
   const b = document.createElement("div"); b.className = "bulle part"; b.textContent = txt;
   const s = document.createElement("div"); s.className = "etat"; s.textContent = "à " + num + " · en route…";
-  setTimeout(() => { $("fil").append(b, s); $("fil").scrollTop = $("fil").scrollHeight; }, 450);
-  setTimeout(() => { s.textContent = "à " + num + " · prêt dans Messages 👁"; if(A) A.envoyerSms(num, txt); }, 1200);
+  setTimeout(() => { $("fil").append(b, s); $("fil").scrollTop = $("fil").scrollHeight; }, 1300);
+  setTimeout(() => { s.textContent = "à " + num + " · prêt dans Messages 👁"; if(A) A.envoyerSms(num, txt); }, 2000);
   $("texte").value = "";
 });
 
@@ -399,6 +514,92 @@ function braises(){
 }
 document.addEventListener("visibilitychange", () => { if(!document.hidden && opt.braises) braises(); });
 if(matchMedia("(prefers-reduced-motion: reduce)").matches) document.body.classList.add("calme");
+
+
+/* ---------- Agenda démoniaque ---------- */
+const MOIS = ["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"];
+const cleJour = d => d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+let evts = lire("agenda", null);
+if(!evts){
+  const a = new Date(), b = new Date(); b.setDate(b.getDate()+2);
+  evts = [
+    {id:1, titre:"Compiler LexOS Démon 2.1 (exemple)", date:cleJour(a), heure:"21:00", lieu:"GitHub"},
+    {id:2, titre:"Souper chez maman (exemple)", date:cleJour(b), heure:"17:30", lieu:"Normandin"}
+  ];
+}
+let vueMois = new Date(); vueMois.setDate(1);
+let jourChoisi = cleJour(new Date());
+function sauverAgenda(){ ecrire("agenda", evts); rendreRituel(); }
+
+function rendreMois(){
+  $("moisNom").textContent = MOIS[vueMois.getMonth()] + " " + vueMois.getFullYear();
+  const m = $("mois"); m.textContent = "";
+  const premier = new Date(vueMois); const decal = (premier.getDay()+6)%7;
+  const debut = new Date(premier); debut.setDate(1-decal);
+  const auj = cleJour(new Date());
+  for(let i=0;i<42;i++){
+    const d = new Date(debut); d.setDate(debut.getDate()+i); const k = cleJour(d);
+    const b = document.createElement("button"); b.type = "button";
+    b.className = "jour" + (d.getMonth()!==vueMois.getMonth()?" autre":"") + (k===auj?" auj":"") + (k===jourChoisi?" choisi":"");
+    b.textContent = d.getDate();
+    if(evts.some(e => e.date===k)) b.appendChild(document.createElement("i"));
+    b.addEventListener("click", () => { jourChoisi = k; if(d.getMonth()!==vueMois.getMonth()){ vueMois = new Date(d); vueMois.setDate(1); } rendreMois(); });
+    m.appendChild(b);
+  }
+  rendreJour();
+}
+function rendreJour(){
+  const [y,mo,da] = jourChoisi.split("-").map(Number); const d = new Date(y,mo-1,da);
+  $("jourNom").textContent = d.toLocaleDateString("fr-CA",{weekday:"long",day:"numeric",month:"long"});
+  const liste = evts.filter(e => e.date===jourChoisi).sort((a,b) => (a.heure||"").localeCompare(b.heure||""));
+  $("jourCompte").textContent = liste.length ? liste.length+" pacte"+(liste.length>1?"s":"") : "";
+  const z = $("evts"); z.textContent = "";
+  if(!liste.length){ const p = document.createElement("p"); p.className = "evtVide"; p.textContent = "Aucun pacte ce jour-là.\nTouche + pour en sceller un."; p.style.whiteSpace = "pre-line"; z.appendChild(p); return; }
+  liste.forEach(e => {
+    const r = document.createElement("div"); r.className = "evt";
+    const t = document.createElement("time"); t.textContent = e.heure || "journée";
+    const c = document.createElement("div"); const b = document.createElement("b"); b.textContent = e.titre; c.appendChild(b);
+    if(e.lieu){ const s = document.createElement("small"); s.textContent = "⌖ " + e.lieu; c.appendChild(s); }
+    const x = document.createElement("button"); x.type = "button"; x.textContent = "✕"; x.setAttribute("aria-label","Supprimer");
+    x.addEventListener("click", () => feuille(e.titre, [["Supprimer ce pacte", () => { evts = evts.filter(z => z.id!==e.id); sauverAgenda(); rendreMois(); }]]));
+    r.append(t, c, x); z.appendChild(r);
+  });
+}
+function rendreRituel(){
+  const maint = new Date(); const k = cleJour(maint), h = String(maint.getHours()).padStart(2,"0")+":"+String(maint.getMinutes()).padStart(2,"0");
+  const proch = evts.filter(e => e.date>k || (e.date===k && (e.heure||"23:59")>=h)).sort((a,b) => (a.date+(a.heure||"")).localeCompare(b.date+(b.heure||"")))[0];
+  const el = $("rituel"); if(!el) return;
+  el.textContent = "";
+  if(!proch){ el.append("aucun pacte à venir"); return; }
+  const [y,mo,da] = proch.date.split("-").map(Number);
+  const quand = proch.date===k ? "aujourd'hui" : new Date(y,mo-1,da).toLocaleDateString("fr-CA",{weekday:"short",day:"numeric",month:"short"});
+  const b = document.createElement("b"); b.textContent = proch.titre;
+  el.append(b, " · " + quand + (proch.heure ? " " + proch.heure : ""));
+}
+function ouvrirAgenda(){ jourChoisi = cleJour(new Date()); vueMois = new Date(); vueMois.setDate(1); rendreMois(); ouvrirVue("agenda"); }
+$("moisPrec").addEventListener("click", () => { vueMois.setMonth(vueMois.getMonth()-1); rendreMois(); });
+$("moisSuiv").addEventListener("click", () => { vueMois.setMonth(vueMois.getMonth()+1); rendreMois(); });
+$("nouvelEvt").addEventListener("click", () => {
+  $("evtTitre").value = ""; $("evtLieu").value = ""; $("evtDate").value = jourChoisi; $("telCaseL").hidden = !A;
+  $("formEvt").hidden = false; setTimeout(() => $("evtTitre").focus(), 50);
+});
+$("evtAnnuler").addEventListener("click", () => { $("formEvt").hidden = true; });
+$("formEvt").addEventListener("click", e => { if(e.target.id==="formEvt") $("formEvt").hidden = true; });
+$("evtForm").addEventListener("submit", e => {
+  e.preventDefault();
+  const ev = {id:Date.now(), titre:$("evtTitre").value.trim(), date:$("evtDate").value, heure:$("evtHeure").value, lieu:$("evtLieu").value.trim()};
+  if(!ev.titre || !ev.date) return;
+  evts.push(ev); sauverAgenda(); jourChoisi = ev.date;
+  const [y,mo] = ev.date.split("-").map(Number); vueMois = new Date(y,mo-1,1);
+  $("formEvt").hidden = true; rendreMois(); surgir("pacte scellé");
+  if(A && $("evtTel").checked && A.agendaTelephone){
+    const [yy,mm,dd] = ev.date.split("-").map(Number); const [hh,mi] = (ev.heure||"09:00").split(":").map(Number);
+    const debut = new Date(yy,mm-1,dd,hh,mi).getTime();
+    setTimeout(() => A.agendaTelephone(ev.titre, ev.lieu, debut, debut+3600000), 900);
+  }
+});
+$("rituel").addEventListener("click", ouvrirAgenda);
+rendreRituel(); setInterval(rendreRituel, 60000);
 
 /* ---------- Démarrage ---------- */
 appliquerOptions();

@@ -18,6 +18,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.VibrationEffect
 import android.os.Vibrator
+import android.provider.CalendarContract
 import android.provider.Settings
 import android.util.Base64
 import android.view.View
@@ -174,6 +175,17 @@ class MainActivity : Activity() {
                 "affichage" -> Intent(Settings.ACTION_DISPLAY_SETTINGS)
                 else -> null
             } ?: return
+            lancer(i)
+        }
+
+        /** Ouvre l'agenda du téléphone avec l'événement prérempli (tu confirmes là-bas). */
+        @JavascriptInterface
+        fun agendaTelephone(titre: String, lieu: String, debut: Long, fin: Long) {
+            val i = Intent(Intent.ACTION_INSERT, CalendarContract.Events.CONTENT_URI)
+                .putExtra(CalendarContract.Events.TITLE, titre)
+                .putExtra(CalendarContract.Events.EVENT_LOCATION, lieu)
+                .putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, debut)
+                .putExtra(CalendarContract.EXTRA_EVENT_END_TIME, fin)
             lancer(i)
         }
 
