@@ -15,6 +15,8 @@ import kotlin.math.min
 import kotlin.math.sin
 import kotlin.random.Random
 
+private class Point(var x: Float, var y: Float, val v: Float, val r: Float, val a: Float)
+
 /** Fond d'écran animé : yeux du démon entièrement rouges, clignements, braises, colère au toucher. */
 class DemonWallpaper : WallpaperService() {
 
@@ -36,7 +38,6 @@ class DemonWallpaper : WallpaperService() {
         private val braise = Paint(Paint.ANTI_ALIAS_FLAG)
         private val noir = Paint().apply { color = Color.BLACK }
 
-        private data class Point(var x: Float, var y: Float, val v: Float, val r: Float, val a: Float)
         private val points = List(45) {
             Point(Random.nextFloat(), Random.nextFloat(), 0.0006f + Random.nextFloat() * 0.0016f, Random.nextFloat() * 1.8f + 0.4f, Random.nextFloat())
         }
@@ -135,8 +136,8 @@ class DemonWallpaper : WallpaperService() {
                 // Clignement toutes les 5,5 s
                 val cycle = t % 5500
                 val ferme = when {
-                    cycle in 5060..5225 -> (cycle - 5060) / 165f
-                    cycle in 5226..5390 -> 1f - (cycle - 5226) / 165f
+                    cycle in 5060L..5225L -> (cycle - 5060) / 165f
+                    cycle in 5226L..5390L -> 1f - (cycle - 5226) / 165f
                     else -> 0f
                 }
                 if (ferme > 0f) {
