@@ -11,8 +11,8 @@ android {
         applicationId = "ca.lexos.demon"
         minSdk = 26
         targetSdk = 34
-        versionCode = 3
-        versionName = "2.1-demon"
+        versionCode = 4
+        versionName = "2.1.1-demon"
     }
 
     // Clé gardée dans le cache GitHub (jamais dans le dépôt) pour que les mises à jour s'installent par-dessus
